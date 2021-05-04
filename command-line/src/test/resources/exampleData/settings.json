@@ -1,0 +1,8 @@
+{
+  "dateFormat": "yyyy.MM.dd HH:mm:ss",
+  "rawGPSPositions": false,
+  "sortData": true,
+  "cleanData": false,
+  "floatSplitter": ",",
+  "columnSplitter": ";"
+}
