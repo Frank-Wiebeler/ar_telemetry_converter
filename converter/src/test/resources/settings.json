@@ -1,6 +1,6 @@
 {
   "dateFormat": "yyyy.MM.dd HH:mm:ss",
-  "rawGPSPositions": false,
+  "rawData": false,
   "sortData": true,
   "cleanData": false,
   "floatSplitter": ",",
