@@ -1,6 +1,12 @@
 package de.dev4Agriculture.telemetryConverter;
 
 import agrirouter.technicalmessagetype.Gps;
+import de.dev4Agriculture.telemetryConverter.Exporter.CSVExporter;
+import de.dev4Agriculture.telemetryConverter.Exporter.DataExporter;
+import de.dev4Agriculture.telemetryConverter.Exporter.KMLExporter;
+import de.dev4Agriculture.telemetryConverter.Importer.DataImporter;
+import de.dev4Agriculture.telemetryConverter.Importer.EFDIImporter;
+import de.dev4Agriculture.telemetryConverter.Importer.GPSInfoImporter;
 import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
 import de.dev4Agriculture.telemetryConverter.dto.GPSList;
 import de.dev4Agriculture.telemetryConverter.exceptions.CSVLockedException;
@@ -19,6 +25,8 @@ import java.text.SimpleDateFormat;
 public class Converter {
     private static Logger log = Logger.getLogger(Converter.class);
     private static DateFormat dateFormat;
+    private static DataImporter dataImporter;
+    private static DataExporter dataExporter;
 
     private static ConverterSettings settings = ConverterSettings.getDefault();
 
@@ -28,15 +36,6 @@ public class Converter {
     }
 
 
-
-    public static void writeCSVFile(GPSList gpsList, Path filePath) throws IOException {
-        String fileContent = gpsList.toCSVString();
-        BufferedWriter writer = new BufferedWriter(new FileWriter(filePath.toString()));
-
-        writer.write(fileContent);
-        writer.close();
-        log.info("Export successfully written");
-    }
 
     public static void formatGPSList(GPSList gpsList){
         gpsList.setSettings(settings);
@@ -50,15 +49,17 @@ public class Converter {
         }
     }
 
-    public static void convertGPSDataFile(
+    public static void convert(
             Path importFilePath,
-            Path exportFilePath
+            Path exportFilePath,
+            DataImporter dataImporter,
+            DataExporter dataExporter
     ) throws GPSNotFoundException, CSVLockedException {
-        Gps.GPSList gpsInfogpsList;
+
+
         GPSList gpsList;
         try {
-            gpsInfogpsList = GPSInfoConverter.readProtobufFile(importFilePath);
-            gpsList = GPSInfoConverter.convertProtobufListToGPSList(gpsInfogpsList);
+            gpsList = dataImporter.loadAndConvertToGPSList(importFilePath);
             formatGPSList(gpsList);
         } catch (FileNotFoundException e) {
             throw new GPSNotFoundException();
@@ -67,48 +68,18 @@ public class Converter {
         }
 
         try {
-            writeCSVFile(gpsList, exportFilePath);
+            dataExporter.export(gpsList, exportFilePath);
         } catch (IOException e) {
             throw new CSVLockedException();
         }
-
-    }
-
-    public static void convertEFDIDataFile(
-            Path importFilePath,
-            Path exportFilePath
-    ) throws CSVLockedException, EFDINotFoundException {
-        GPSList gpsList;
-        GrpcEfdi.TimeLog timeLog;
-        try {
-            timeLog = EFDIConverter.readProtobufFile(importFilePath);
-            gpsList = EFDIConverter.convertProtobufListToGPSList( timeLog);
-            formatGPSList(gpsList);
-            if( settings.sortData) {
-                gpsList.sortGPSData();
-            }
-
-            if( settings.cleanData){
-                gpsList.cleanGPSData();
-            }
-        } catch (FileNotFoundException e) {
-            throw new EFDINotFoundException();
-        } catch (IOException e) {
-            throw new EFDINotFoundException();
-        }
-
-        try {
-            writeCSVFile(gpsList, exportFilePath);
-        } catch (IOException e) {
-            throw new CSVLockedException();
-        }
-
 
     }
 
     public static void convertEFDIZip(
             Path importFilePath,
-            Path exportFilePath
+            Path exportFilePath,
+            DataImporter dataImporter,
+            DataExporter dataExporter
     ) throws CSVLockedException, EFDINotFoundException, ZipNotLoadedException {
         GPSList gpsList;
         GrpcEfdi.TimeLog timeLog;
@@ -120,14 +91,19 @@ public class Converter {
         }
         File outFolder = exportFilePath.toFile();
         if(!outFolder.exists()){
-            outFolder.mkdirs();
+            if(!outFolder.mkdirs()){
+                outFolder = exportFilePath.toFile();//Not sure if we need to assign it again to update the status, but better safe than sorry
+                if(!outFolder.exists()) {
+                    log.error("Root folder to extract convert the files could not be created. Please choose a differen path");
+                    return;
+                }
+            }
         }
 
         if ( zipefdiHandler.count() > 0){
             while (zipefdiHandler.nextZipEFDIEntry()){
                 try {
-                    timeLog = EFDIConverter.readProtobufFile(zipefdiHandler.getZipEFDIEntryStream());
-                    gpsList = EFDIConverter.convertProtobufListToGPSList( timeLog);
+                    gpsList = dataImporter.loadAndConvertToGPSList(zipefdiHandler.getZipEFDIEntryStream());
                     formatGPSList(gpsList);
                     if( settings.sortData) {
                         gpsList.sortGPSData();
@@ -143,7 +119,8 @@ public class Converter {
                 }
 
                 try {
-                    writeCSVFile(gpsList, Paths.get(exportFilePath.toString(),zipefdiHandler.getCSVName()));
+                    dataExporter.setConverterSettings(settings);
+                    dataExporter.export(gpsList, Paths.get(exportFilePath.toString(),zipefdiHandler.getCSVName()));
                 } catch (IOException e) {
                     throw new CSVLockedException();
                 }
@@ -151,5 +128,28 @@ public class Converter {
         }
 
     }
+
+    public static void convertGPS2CSV(Path inputPath, Path outputPath) throws GPSNotFoundException, CSVLockedException {
+        DataImporter dataImporter = new GPSInfoImporter();
+        DataExporter dataExporter = new CSVExporter();
+        convert(inputPath,outputPath,dataImporter,dataExporter);
+    }
+
+    public static void convertGPS2KML(Path inputPath, Path outputPath) throws GPSNotFoundException, CSVLockedException {
+        DataImporter dataImporter = new GPSInfoImporter();
+        DataExporter dataExporter = new KMLExporter();
+        convert(inputPath,outputPath,dataImporter,dataExporter);
+    }
+    public static void convertEFDI2CSV(Path inputPath, Path outputPath) throws GPSNotFoundException, CSVLockedException {
+        DataImporter dataImporter = new EFDIImporter();
+        DataExporter dataExporter = new CSVExporter();
+        convert(inputPath,outputPath,dataImporter,dataExporter);
+    }
+    public static void convertEFDI2KML(Path inputPath, Path outputPath) throws GPSNotFoundException, CSVLockedException {
+        DataImporter dataImporter = new EFDIImporter();
+        DataExporter dataExporter = new KMLExporter();
+        convert(inputPath,outputPath,dataImporter,dataExporter);
+    }
+
 
 }

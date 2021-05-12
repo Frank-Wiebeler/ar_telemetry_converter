@@ -31,10 +31,10 @@ public class TelemetryConverterTest {
     @Test
     public void canConvertGPSFiles(){
         rootpath = rootpath.replace("resrootfile.txt","");
-        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/gps/gps.bin",rootpath+"exampleData/gps_output_1.csv",rootpath+"exampleData/settings.json", TelemetryConverterCLI.InputFormat.GPS));
+        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/gps/gps.bin",rootpath+"exampleData/gps_output_1.csv",rootpath+"exampleData/settings.json", TelemetryConverterCLI.InputFormat.GPS, TelemetryConverterCLI.OutputFormat.CSV));
 
         assertThrows(GPSNotFoundException.class,
-                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/gps/notthere.bin",rootpath+"exampleData/gps_output_3.bin",rootpath + "exampleData/settings.json", TelemetryConverterCLI.InputFormat.GPS),
+                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/gps/notthere.bin",rootpath+"exampleData/gps_output_3.bin",rootpath + "exampleData/settings.json", TelemetryConverterCLI.InputFormat.GPS, TelemetryConverterCLI.OutputFormat.CSV),
                 "Expected notFoundError"
                 );
 
@@ -43,10 +43,10 @@ public class TelemetryConverterTest {
     @Test
     public void canConvertEFDIFiles(){
         rootpath = rootpath.replace("resrootfile.txt","");
-        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/efdi.bin",rootpath+"exampleData/efdi_output_1.csv",rootpath+"exampleData/settings.json", TelemetryConverterCLI.InputFormat.EFDI));
+        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/efdi.bin",rootpath+"exampleData/efdi_output_1.csv",rootpath+"exampleData/settings.json", TelemetryConverterCLI.InputFormat.EFDI, TelemetryConverterCLI.OutputFormat.CSV));
 
         assertThrows(EFDINotFoundException.class,
-                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/efdi/notthere.bin",rootpath+"exampleData/efdi_output_2.csv",rootpath + "exampleData/settings.json", TelemetryConverterCLI.InputFormat.EFDI),
+                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/efdi/notthere.bin",rootpath+"exampleData/efdi_output_2.csv",rootpath + "exampleData/settings.json", TelemetryConverterCLI.InputFormat.EFDI, TelemetryConverterCLI.OutputFormat.CSV),
                 "Expected notFoundError"
         );
 
