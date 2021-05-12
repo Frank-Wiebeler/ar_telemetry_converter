@@ -56,7 +56,7 @@ public class Converter {
             DataExporter dataExporter
     ) throws GPSNotFoundException, CSVLockedException {
 
-
+        dataExporter.setConverterSettings(settings);
         GPSList gpsList;
         try {
             gpsList = dataImporter.loadAndConvertToGPSList(importFilePath);

@@ -212,6 +212,6 @@ public class TelemetryConverterCLI {
 
 
     public static void printVersion(){
-        System.out.println("V1.1_2021-05-06");
+        System.out.println("V1.2_2021-05-12");
     }
 }
