@@ -29,28 +29,7 @@ public class GPSList {
         this.gpsEntryList.add(gpsListEntry);
     }
 
-    public String toCSVString(){
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("timeStamp"+ converterSettings.columnSplitter +
-                        "latitude"+ converterSettings.columnSplitter +
-                        "longitude"+ converterSettings.columnSplitter +
-                        "altitude"+ converterSettings.columnSplitter +
-                        "status"+ converterSettings.columnSplitter +
-                        "numberOfSatellites"+ converterSettings.columnSplitter +
-                        "pdop" + converterSettings.columnSplitter +
-                        "hdop\n");
 
-
-        for (GPSListEntry gpsListEntry: gpsEntryList) {
-            if( converterSettings.rawData) {
-                stringBuilder.append(gpsListEntry.getRawCSVLine());
-            } else {
-                stringBuilder.append(gpsListEntry.getCSVLine());
-            }
-        }
-
-        return stringBuilder.toString();
-    }
 
     public void cleanGPSData() {
         List<GPSListEntry> entriesToRemove = new ArrayList<>();
@@ -78,5 +57,9 @@ public class GPSList {
     public void setDateFormat(DateFormat _dateFormat) {
         dateFormat = _dateFormat;
         GPSListEntry.setDateFormat(dateFormat);
+    }
+
+    public List<GPSListEntry> getList() {
+        return this.gpsEntryList;
     }
 }

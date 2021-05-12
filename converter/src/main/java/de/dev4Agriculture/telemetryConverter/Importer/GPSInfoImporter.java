@@ -1,15 +1,16 @@
-package de.dev4Agriculture.telemetryConverter;
+package de.dev4Agriculture.telemetryConverter.Importer;
 
 import agrirouter.technicalmessagetype.Gps;
 import de.dev4Agriculture.telemetryConverter.dto.GPSList;
 import de.dev4Agriculture.telemetryConverter.dto.GPSListEntry;
+import org.aef.efdi.GrpcEfdi;
 
 import java.io.*;
 import java.nio.file.Path;
 
-public class GPSInfoConverter {
+public class GPSInfoImporter implements  DataImporter {
 
-  public static Gps.GPSList readProtobufFile(Path name) throws IOException {
+  private Gps.GPSList readProtobufFile(Path name) throws IOException {
     InputStream inputStream = new FileInputStream(name.toString());
     System.out.println("Could load file");
     Gps.GPSList gpsList = Gps.GPSList.parseFrom(inputStream);
@@ -17,8 +18,13 @@ public class GPSInfoConverter {
     return gpsList;
   }
 
+  private Gps.GPSList readProtobufFile(InputStream inputStream) throws IOException {
+    Gps.GPSList gpsList = Gps.GPSList.parseFrom(inputStream);
+    System.out.println("Loaded File; Size of list: " + gpsList.getGpsEntriesList().size());
+    return gpsList;
+  }
 
-  public static GPSList convertProtobufListToGPSList(Gps.GPSList gpsInfoList) {
+  private GPSList convertProtobufListToGPSList(Gps.GPSList gpsInfoList) {
     GPSList gpsList = new GPSList();
     for ( Gps.GPSList.GPSEntry entry: gpsInfoList.getGpsEntriesList()
     ) {
@@ -35,5 +41,16 @@ public class GPSInfoConverter {
     }
 
     return gpsList;
+  }
+
+
+  public GPSList loadAndConvertToGPSList(Path importFilePath) throws IOException {
+    Gps.GPSList gpsInfogpsList = this.readProtobufFile(importFilePath);
+    return this.convertProtobufListToGPSList(gpsInfogpsList);
+  }
+
+  public GPSList loadAndConvertToGPSList(InputStream inputStream) throws IOException {
+    Gps.GPSList gpsInfogpsList = this.readProtobufFile(inputStream);
+    return this.convertProtobufListToGPSList(gpsInfogpsList);
   }
 }

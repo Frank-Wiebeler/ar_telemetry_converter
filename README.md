@@ -56,7 +56,9 @@ Description of Parameters:
     * GPS: A .bin file including gps:info protobuf messages
     * EFDI: A .bin file including efdi:timelog messages
     * EFDI_ZIP: A .zip file including multiple efdi:timelog files. Output needs to be a path 
-
+* -fo: Is followed by the Output format:
+  * CSV: Exports an Excel-Like CommaSeparatedValues file. CSV is the standard in case, fo is not defined
+  * KML: Exports a Google Earth position list
 
 ### settings.json
 
@@ -77,24 +79,40 @@ If no settings are provided, a default setting is used
 We provide a few example datasets for testing. Those are in the folder ./exampleData, so 
 you should open the command line in the root folder of this project
 
-#### Convert GPS Data
+#### Convert GPS Data to CSV
 
 ````
 ar_telemetry_converter -i ./exampleData/gps.bin -o ./exampleResults/gps.csv -s ./exampleData/settings.json -fi GPS
 ````
+#### Convert GPS Data to KML
 
-#### Convert EFDI Data
+````
+ar_telemetry_converter -i ./exampleData/gps.bin -o ./exampleResults/gps.kml -s ./exampleData/settings.json -fi GPS -fo KML
+````
+
+#### Convert EFDI Data to CSV
 
 ````
 ar_telemetry_converter -i ./exampleData/efdi.bin -o ./exampleResults/efdi.csv -s ./exampleData/settings.json -fi EFDI
 ````
 
-#### Convert EFDI from a ZIP Folder
+#### Convert EFDI Data to KML
+
+````
+ar_telemetry_converter -i ./exampleData/efdi.bin -o ./exampleResults/efdi.kml -s ./exampleData/settings.json -fi EFDI -fo KML
+````
+
+#### Convert EFDI from a ZIP Folder to CSV
 
 ````
 ar_telemetry_converter -i ./exampleData/efdiZIP.zip -o ./exampleResults/efdi_zip -s ./exampleData/settings.json -fi EFDI_ZIP
 ````
 
+#### Convert EFDI from a ZIP Folder to KML
+
+````
+ar_telemetry_converter -i ./exampleData/efdiZIP.zip -o ./exampleResults/efdi_zip -s ./exampleData/settings.json -fi EFDI_ZIP -fo KML
+````
 
 
 ## Build Application

@@ -10,7 +10,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class GPSInfoConverterTest {
+public class GPSInfoImporterTest {
 
     private String resourcePathFromURI(String resourceName) throws URISyntaxException {
         URI uri = ClassLoader.getSystemResource(resourceName).toURI();
@@ -21,11 +21,35 @@ public class GPSInfoConverterTest {
 
 
     @Test
-    public void ConvertExampleDataAsRawDataTest() throws GPSNotFoundException, CSVLockedException, URISyntaxException {
+    public void ConvertGPS2CSVTest() throws GPSNotFoundException, CSVLockedException, URISyntaxException {
         Path input = Paths.get(resourcePathFromURI("inputGPS.bin"));
-        Path output= Paths.get("export.csv");
+        Path output= Paths.get("export_gps.csv");
         Converter.setSettings(ConverterSettings.getDefault());
-        Converter.convertGPSDataFile(input,output);
+        Converter.convertGPS2CSV(input,output);
+    }
+
+    @Test
+    public void ConvertGPS2KMLTest() throws GPSNotFoundException, CSVLockedException, URISyntaxException {
+        Path input = Paths.get(resourcePathFromURI("inputGPS.bin"));
+        Path output= Paths.get("export_gps.kml");
+        Converter.setSettings(ConverterSettings.getDefault());
+        Converter.convertGPS2KML(input,output);
+    }
+
+    @Test
+    public void ConvertEFDI2CSVTest() throws GPSNotFoundException, CSVLockedException, URISyntaxException {
+        Path input = Paths.get(resourcePathFromURI("inputEFDI.bin"));
+        Path output= Paths.get("export_efdi.csv");
+        Converter.setSettings(ConverterSettings.getDefault());
+        Converter.convertEFDI2CSV(input,output);
+    }
+
+    @Test
+    public void ConvertEFDI2KMLTest() throws GPSNotFoundException, CSVLockedException, URISyntaxException {
+        Path input = Paths.get(resourcePathFromURI("inputEFDI.bin"));
+        Path output= Paths.get("export_efdi.kml");
+        Converter.setSettings(ConverterSettings.getDefault());
+        Converter.convertEFDI2KML(input,output);
     }
 
     @Test
