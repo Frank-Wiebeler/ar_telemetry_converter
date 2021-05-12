@@ -1,9 +1,11 @@
 package de.dev4Agriculture.telemetryConverter.Exporter;
 
 import agrirouter.technicalmessagetype.Gps;
+import de.dev4Agriculture.telemetryConverter.Converter;
 import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
 import de.dev4Agriculture.telemetryConverter.dto.GPSList;
 import de.dev4Agriculture.telemetryConverter.dto.GPSListEntry;
+import org.apache.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -11,6 +13,7 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class KMLExporter implements DataExporter {
+    private static org.apache.log4j.Logger log = Logger.getLogger(Converter.class);
     private static final double ALTITUDE_FACTOR = (1.0 / 1000);
     private ConverterSettings settings;
 
@@ -74,5 +77,6 @@ public class KMLExporter implements DataExporter {
 
         writer.write(fileContent);
         writer.close();
+        log.info("Export successfully written");
     }
 }
