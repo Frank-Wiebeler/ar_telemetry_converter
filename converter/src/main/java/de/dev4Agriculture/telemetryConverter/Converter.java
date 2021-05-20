@@ -152,4 +152,8 @@ public class Converter {
     }
 
 
+    public static String getVersion(){
+        return "V1.4_2021-05-20";
+    }
+
 }

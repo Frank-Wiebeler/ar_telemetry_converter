@@ -33,13 +33,12 @@ public class KMLExporter implements DataExporter {
                 "      </PolyStyle>\n" +
                 "    </Style>\n" +
                 "    <Placemark>\n" +
-                "      <name>Absolute Extruded</name>\n" +
+                "      <name>Driving Route</name>\n" +
                 "      <description>Transparent green wall with yellow outlines</description>\n" +
                 "      <styleUrl>#yellowLineGreenPoly</styleUrl>\n" +
                 "      <LineString>\n" +
-                "        <extrude>1</extrude>\n" +
                 "        <tessellate>1</tessellate>\n" +
-                "        <coordinates> ";
+                "        <coordinates> \n";
     }
 
     private String getKMLGPSList(GPSList gpsList){
@@ -50,9 +49,10 @@ public class KMLExporter implements DataExporter {
                             (entry.status != Gps.GPSList.GPSEntry.PositionStatus.D_NO_GPS) &&
                             (entry.status != Gps.GPSList.GPSEntry.PositionStatus.D_NOT_AVAILABLE)
             ) {
-                fileContent.append(entry.longitude + "," + entry.latitude + "," + entry.altitude * ALTITUDE_FACTOR + " \n");
+                fileContent.append(entry.longitude + "," + entry.latitude + ",0 ");
             }
         }
+        fileContent.append("\n");
         return  fileContent.toString();
     }
 
