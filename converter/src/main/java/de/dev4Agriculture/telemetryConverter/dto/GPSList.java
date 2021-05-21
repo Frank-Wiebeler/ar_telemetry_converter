@@ -1,16 +1,17 @@
 package de.dev4Agriculture.telemetryConverter.dto;
 
 import agrirouter.technicalmessagetype.Gps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 public class GPSList {
-    private static Logger log = Logger.getLogger(GPSList.class);
+    private static Logger log = LogManager.getLogger(GPSList.class);
     List<GPSListEntry> gpsEntryList;
     ConverterSettings converterSettings;
     public static DateFormat dateFormat = new SimpleDateFormat();

@@ -10,16 +10,16 @@ import de.dev4Agriculture.telemetryConverter.Importer.GPSInfoImporter;
 import de.dev4Agriculture.telemetryConverter.enumations.OutputFormatEnum;
 import de.dev4Agriculture.telemetryConverter.enumations.InputFormatEnum;
 import de.dev4Agriculture.telemetryConverter.exceptions.*;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import de.dev4Agriculture.telemetryConverter.Converter;
 import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Paths;
 import java.util.*;
 
 public class TelemetryConverterCLI {
-    public static Logger log = Logger.getLogger(TelemetryConverterCLI.class);
+    private static Logger log = LogManager.getLogger(TelemetryConverterCLI.class);
     public enum NextParamType {
         NONE,
         INPUT,
@@ -68,7 +68,6 @@ public class TelemetryConverterCLI {
     }
 
     public static void main(String[] args) {
-        BasicConfigurator.configure();
         boolean infoWasPrinted = false;
         String inputPath = "";
         String outputPath = "";

@@ -14,7 +14,8 @@ import de.dev4Agriculture.telemetryConverter.exceptions.EFDINotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.GPSNotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.ZipNotLoadedException;
 import org.aef.efdi.GrpcEfdi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -23,7 +24,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class Converter {
-    private static Logger log = Logger.getLogger(Converter.class);
+    private static Logger log = LogManager.getLogger(Converter.class);
     private static DateFormat dateFormat;
     private static DataImporter dataImporter;
     private static DataExporter dataExporter;

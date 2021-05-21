@@ -331,7 +331,7 @@ public class ConverterUI extends ConverterCallback {
         Handler handler;
         try {
             handler = new FileHandler("test.log", 10000000, 1);
-            Logger.getLogger("").addHandler(handler);
+            Logger.getLogger("").addHandler(handler);//TODO Redirect this to the Output field logArea
         } catch (IOException e) {
             e.printStackTrace();
         }

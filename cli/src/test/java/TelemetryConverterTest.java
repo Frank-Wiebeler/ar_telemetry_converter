@@ -3,8 +3,9 @@ import de.dev4Agriculture.telemetryConverter.enumations.InputFormatEnum;
 import de.dev4Agriculture.telemetryConverter.exceptions.EFDINotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.GPSNotFoundException;
 import de.dev4Agriculture.telemetryConverter.cli.TelemetryConverterCLI;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.lf5.util.Resource;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -20,7 +21,8 @@ public class TelemetryConverterTest {
 
     @BeforeAll
     public static void init(){
-        BasicConfigurator.configure();
+        Configurator.initialize(new DefaultConfiguration());
+        Configurator.setRootLevel(Level.INFO);
         URL resourceURL =TelemetryConverterTest.class.getResource("resrootfile.txt");
         if(resourceURL != null) {
             rootpath = resourceURL.getPath().substring(1);
