@@ -19,11 +19,10 @@ import org.apache.commons.collections4.bidimap.DualHashBidiMap;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.awt.event.ItemEvent;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Paths;
@@ -57,8 +56,48 @@ public class ConverterUI extends ConverterCallback {
     private BidiMap<InputFormatEnum, String> inputComboboxEntries;
 
     private BidiMap<OutputFormatEnum, String> outputComboboxEntries;
+    Border border = BorderFactory.createLineBorder(Color.RED);
 
 
+    public ConverterUI() {
+        outputFormatCombobox.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent actionEvent) {
+                if(!outputFormatCombobox.getSelectedItem().toString().equals("CSV")){
+                    floatSplitterTextField.setEnabled(false);
+                    columnSplitterTextField.setEnabled(false);
+                    dateFormatTextField.setEnabled(false);
+                }else{
+                    floatSplitterTextField.setEnabled(true);
+                    columnSplitterTextField.setEnabled(true);
+                    dateFormatTextField.setEnabled(true);
+                }
+
+            }
+        });
+        floatSplitterTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyTyped(e);
+                if(floatSplitterTextField.getText().length()>1 || floatSplitterTextField.getText().length()==0){
+                    floatSplitterTextField.setBorder(border);
+                }else{
+                    floatSplitterTextField.setBorder(new JTextField().getBorder());
+                }
+            }
+        });
+        columnSplitterTextField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                super.keyTyped(e);
+                if(columnSplitterTextField.getText().length()>1 || columnSplitterTextField.getText().length()==0){
+                    columnSplitterTextField.setBorder(border);
+                }else{
+                    columnSplitterTextField.setBorder(null);
+                }
+            }
+        });
+    }
 
     @Override
     public void printLn(String entry){
@@ -240,50 +279,7 @@ public class ConverterUI extends ConverterCallback {
         floatSplitterTextField.setText(uiSettings.converterSettings.floatSplitter);
 
         convertButton.addActionListener(e -> {
-            DataImporter dataImporter;
-            boolean isZip;
-                if(uiSettings.inputFormat.equals(InputFormatEnum.EFDI)){
-                dataImporter = new EFDIImporter();
-                isZip = false;
-            } else if(uiSettings.inputFormat.equals(InputFormatEnum.EFDI_ZIP)){
-                dataImporter = new EFDIImporter();
-                isZip = true;
-            } else if(uiSettings.inputPath.equals(InputFormatEnum.GPS)){
-                dataImporter = new GPSInfoImporter();
-                isZip = false;
-            } else {
-                printLn("No Import Format selected");
-                return;
-            }
-
-            DataExporter dataExporter;
-
-            if(uiSettings.outputFormat.equals(OutputFormatEnum.CSV)){
-                dataExporter = new CSVExporter();
-            } else {
-                dataExporter = new KMLExporter();
-            }
-
-            Converter.setSettings(uiSettings.converterSettings);
-            if(isZip){
-                try {
-                    Converter.convertEFDIZip( Paths.get(uiSettings.inputPath), Paths.get(uiSettings.outputPath), dataImporter, dataExporter);
-                } catch (CSVLockedException csvLockedException) {
-                    printLn("Could not access CSV; is it opened?");
-                } catch (EFDINotFoundException efdiNotFoundException) {
-                    printLn("EFDI file not found or broken");
-                } catch (ZipNotLoadedException zipNotLoadedException) {
-                    printLn("Zip could not be loaded, is it defect?");
-                }
-            } else {
-                try {
-                    Converter.convert( Paths.get(uiSettings.inputPath), Paths.get(uiSettings.outputPath), dataImporter, dataExporter);
-                } catch (GPSNotFoundException gpsNotFoundException) {
-                    printLn("GPSList File could not be found");
-                } catch (CSVLockedException csvLockedException) {
-                    printLn("Could not access CSV; is it opened?");
-                }
-            }
+            convertDataSet();
         });
 
         aboutButton.addActionListener(e ->
@@ -316,6 +312,53 @@ public class ConverterUI extends ConverterCallback {
             if(entry.getValue().equals(content)) {
                 uiSettings.outputFormat = entry.getKey();
                 saveJSONConfig();
+            }
+        }
+    }
+
+    public void convertDataSet(){
+        DataImporter dataImporter;
+        boolean isZip;
+        if(uiSettings.inputFormat.equals(InputFormatEnum.EFDI)){
+            dataImporter = new EFDIImporter();
+            isZip = false;
+        } else if(uiSettings.inputFormat.equals(InputFormatEnum.EFDI_ZIP)){
+            dataImporter = new EFDIImporter();
+            isZip = true;
+        } else if(uiSettings.inputFormat.equals(InputFormatEnum.GPS)){
+            dataImporter = new GPSInfoImporter();
+            isZip = false;
+        } else {
+            printLn("No Import Format selected");
+            return;
+        }
+
+        DataExporter dataExporter;
+
+        if(uiSettings.outputFormat.equals(OutputFormatEnum.CSV)){
+            dataExporter = new CSVExporter();
+        } else {
+            dataExporter = new KMLExporter();
+        }
+
+        Converter.setSettings(uiSettings.converterSettings);
+        if(isZip){
+            try {
+                Converter.convertEFDIZip( Paths.get(uiSettings.inputPath), Paths.get(uiSettings.outputPath), dataImporter, dataExporter);
+            } catch (CSVLockedException csvLockedException) {
+                printLn("Could not access CSV; is it opened?");
+            } catch (EFDINotFoundException efdiNotFoundException) {
+                printLn("EFDI file not found or broken");
+            } catch (ZipNotLoadedException zipNotLoadedException) {
+                printLn("Zip could not be loaded, is it defect?");
+            }
+        } else {
+            try {
+                Converter.convert( Paths.get(uiSettings.inputPath), Paths.get(uiSettings.outputPath), dataImporter, dataExporter);
+            } catch (GPSNotFoundException gpsNotFoundException) {
+                printLn("GPSList File could not be found");
+            } catch (CSVLockedException csvLockedException) {
+                printLn("Could not access CSV; is it opened?");
             }
         }
     }
@@ -360,9 +403,15 @@ public class ConverterUI extends ConverterCallback {
         ConverterUI converterUI = new ConverterUI();
         jframe.setContentPane(converterUI.mainContainer);
         jframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        jframe.pack();
         jframe.setVisible(true);
+        jframe.setResizable(false);
+        jframe.setSize(1280,720);
+        jframe.pack();
+
         converterUI.init();
     }
 
+    private void createUIComponents() {
+        // TODO: place custom component creation code here
+    }
 }
