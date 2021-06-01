@@ -60,6 +60,38 @@ public class ConverterUI extends ConverterCallback {
 
 
     public ConverterUI() {
+
+    }
+
+    @Override
+    public void printLn(String entry){
+        super.printLn(entry);
+        SwingUtilities.invokeLater(() -> {
+            logAreaModel.addElement(entry + "\n");
+        });
+    }
+
+    public void  saveJSONConfig(){
+        try {
+            uiSettings.toFile(Paths.get(UI_SETTINGS_PATH));
+        } catch (IOException ioException) {
+            printLn("Could not store updated Settings");
+            ioException.printStackTrace();
+        }
+    }
+
+    public int indexOfValueInHashMap(Map<?,String> map, Enum key){
+        int index = 0;
+        for(String keyEntry: map.values()){
+            if(keyEntry.equals(key)){
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    public void init(){
         outputFormatCombobox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -97,37 +129,6 @@ public class ConverterUI extends ConverterCallback {
                 }
             }
         });
-    }
-
-    @Override
-    public void printLn(String entry){
-        super.printLn(entry);
-        SwingUtilities.invokeLater(() -> {
-            logAreaModel.addElement(entry + "\n");
-        });
-    }
-
-    public void  saveJSONConfig(){
-        try {
-            uiSettings.toFile(Paths.get(UI_SETTINGS_PATH));
-        } catch (IOException ioException) {
-            printLn("Could not store updated Settings");
-            ioException.printStackTrace();
-        }
-    }
-
-    public int indexOfValueInHashMap(Map<?,String> map, Enum key){
-        int index = 0;
-        for(String keyEntry: map.values()){
-            if(keyEntry.equals(key)){
-                return index;
-            }
-            index++;
-        }
-        return -1;
-    }
-
-    public void init(){
         logAreaModel = new DefaultListModel<>();
         logArea.setModel(logAreaModel);
         try {
