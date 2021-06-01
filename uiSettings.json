@@ -1,0 +1,1 @@
+{"inputPath":"C:\\Users\\frank\\Downloads\\GPS_2021-05-24.bin","outputPath":"C:\\Users\\frank\\Downloads\\gps_2021-05-24.csv","inputFormat":"GPS","outputFormat":"CSV","converterSettings":{"dateFormat":"yyyy.MM.dd HH:mm:ss","rawData":true,"sortData":true,"cleanData":true,"floatSplitter":".","columnSplitter":","}}
