@@ -12,6 +12,7 @@ import de.dev4Agriculture.telemetryConverter.enumations.InputFormatEnum;
 import de.dev4Agriculture.telemetryConverter.exceptions.*;
 import de.dev4Agriculture.telemetryConverter.Converter;
 import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
+import de.dev4Agriculture.telemetryConverter.ui.ConverterUI;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -75,6 +76,10 @@ public class TelemetryConverterCLI {
         InputFormatEnum inputFormat = InputFormatEnum.UNKNOWN;
         OutputFormatEnum outputFormat = OutputFormatEnum.CSV;//To be backwards compatible, that's the default
         NextParamType nextParamType = NextParamType.NONE;
+        if(args.length == 0){
+            ConverterUI.main(null);
+            return;
+        }
         for (String argument : args) {
             if (nextParamType.equals(NextParamType.NONE)) {
                 if (argument.equals("-i")) {
@@ -95,7 +100,7 @@ public class TelemetryConverterCLI {
                     nextParamType = NextParamType.NONE;
                     infoWasPrinted = true;
                     printVersion();
-                } else {
+                }else {
                     System.out.println("Error in the command line syntax. Received entries: " + args.toString());
                 }
             } else if(nextParamType.equals(NextParamType.INPUT)){

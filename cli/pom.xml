@@ -105,6 +105,13 @@
             <scope>compile</scope>
         </dependency>
 
+        <dependency>
+            <groupId>de.dev4Agriculture.arTelemetryConverter</groupId>
+            <artifactId>ui</artifactId>
+            <version>1.4-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
         <!-- https://mvnrepository.com/artifact/org.apache.logging.log4j/log4j-core -->
         <dependency>
             <groupId>org.apache.logging.log4j</groupId>

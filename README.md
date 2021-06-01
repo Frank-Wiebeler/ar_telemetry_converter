@@ -39,6 +39,9 @@ You should receive a version output
 V1.1_2021-05-06
 ````
 
+## UserInterface
+
+To start the UserInterface, don't add any parameters at all.
 
 ## CommandLine
 
