@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class CSVExporter implements DataExporter {
-    private static Logger log = LogManager.getLogger(Converter.class);
     private ConverterSettings converterSettings;
 
     public void setConverterSettings(ConverterSettings converterSettings){
@@ -51,7 +50,7 @@ public class CSVExporter implements DataExporter {
 
         writer.write(fileContent);
         writer.close();
-        log.info("Export successfully written");
+        System.out.println("Export successfully written");
     }
 
 }

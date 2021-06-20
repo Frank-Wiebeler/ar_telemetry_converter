@@ -24,7 +24,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class Converter {
-    private static Logger log = LogManager.getLogger(Converter.class);
     private static DateFormat dateFormat;
     private static DataImporter dataImporter;
     private static DataExporter dataExporter;
@@ -95,7 +94,7 @@ public class Converter {
             if(!outFolder.mkdirs()){
                 outFolder = exportFilePath.toFile();//Not sure if we need to assign it again to update the status, but better safe than sorry
                 if(!outFolder.exists()) {
-                    log.error("Root folder to extract convert the files could not be created. Please choose a differen path");
+                    System.out.println("ERROR: Root folder to extract convert the files could not be created. Please choose a differen path");
                     return;
                 }
             }

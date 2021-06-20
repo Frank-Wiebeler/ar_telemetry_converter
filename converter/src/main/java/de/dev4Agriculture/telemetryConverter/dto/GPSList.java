@@ -11,7 +11,6 @@ import java.util.Collections;
 import java.util.List;
 
 public class GPSList {
-    private static Logger log = LogManager.getLogger(GPSList.class);
     List<GPSListEntry> gpsEntryList;
     ConverterSettings converterSettings;
     public static DateFormat dateFormat = new SimpleDateFormat();
@@ -46,13 +45,13 @@ public class GPSList {
         }
         int count= entriesToRemove.size();
         gpsEntryList.removeAll(entriesToRemove);
-        log.info("Cleaned List from unknown GPS positions; deleted " + count + " entries");
+        System.out.println("Cleaned List from unknown GPS positions; deleted " + count + " entries");
     }
 
 
     public void sortGPSData() {
         Collections.sort(gpsEntryList);
-        log.info("List sorted by date");
+        System.out.println("List sorted by date");
     }
 
     public void setDateFormat(DateFormat _dateFormat) {

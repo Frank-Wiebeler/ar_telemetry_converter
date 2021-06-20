@@ -20,7 +20,6 @@ import java.nio.file.Paths;
 import java.util.*;
 
 public class TelemetryConverterCLI {
-    private static Logger log = LogManager.getLogger(TelemetryConverterCLI.class);
     public enum NextParamType {
         NONE,
         INPUT,
@@ -34,9 +33,9 @@ public class TelemetryConverterCLI {
         DataExporter dataExporter;
         DataImporter dataImporter;
         if (inputPath.equals("")) {
-            log.error("No Input path provided");
+            System.out.println("ERROR: No Input path provided");
         } else if (outputPath.equals("")) {
-            log.error("No Output Path provided");
+            System.out.println("ERROR: No Output Path provided");
         }
         ConverterSettings settings;
         if (settingsPath.equals("")) {
@@ -144,30 +143,30 @@ public class TelemetryConverterCLI {
             if(infoWasPrinted) {
                 return;
             } else {
-                log.error("InputPath or OutputPath missing");
+                System.out.println("ERROR: InputPath or OutputPath missing");
             }
         }
 
         if(outputFormat == OutputFormatEnum.UNKNOWN){
-            log.error("Output format is wrong");
+            System.out.println("ERROR: Output format is wrong");
         }
 
         try {
             convert(inputPath,outputPath,settingsPath,inputFormat,outputFormat);
         } catch (GPSNotFoundException e) {
-            log.error("Error: GPS File not found");
+            System.out.println("ERROR: GPS File not found");
         } catch (CSVLockedException e) {
-            log.error("Error: CSV-File is locked. Is it opened, e.g. in Excel?");
+            System.out.println("ERROR: CSV-File is locked. Is it opened, e.g. in Excel?");
         } catch (SettingsNotFoundException e) {
-            log.error("Error: Settings could not be loaded");
+            System.out.println("ERROR: Settings could not be loaded");
         } catch (EFDINotFoundException e) {
-            log.error("Error: EFDI could not be loaded");
+            System.out.println("ERROR: EFDI could not be loaded");
         } catch (ZipNotLoadedException e) {
-            log.error("Error: EFDI Zip could not be loaded");
+            System.out.println("ERROR: EFDI Zip could not be loaded");
         } catch (NoImporterSpecifiedException e) {
-            log.error("Error: No importer defined. Must be GPS,EFDI or EFDI_ZIP");
+            System.out.println("ERROR: No importer defined. Must be GPS,EFDI or EFDI_ZIP");
         } catch (NoExporterSpecificedException e) {
-            log.error("Error: No exporter defined. Must be CSV or KML");
+            System.out.println("ERROR: No exporter defined. Must be CSV or KML");
         }
 
 

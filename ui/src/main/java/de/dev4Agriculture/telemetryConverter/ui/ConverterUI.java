@@ -3,7 +3,6 @@ package de.dev4Agriculture.telemetryConverter.ui;
 import com.intellij.uiDesigner.core.GridConstraints;
 import com.intellij.uiDesigner.core.GridLayoutManager;
 import de.dev4Agriculture.telemetryConverter.Converter;
-import de.dev4Agriculture.telemetryConverter.ConverterCallback;
 import de.dev4Agriculture.telemetryConverter.Exporter.CSVExporter;
 import de.dev4Agriculture.telemetryConverter.Exporter.DataExporter;
 import de.dev4Agriculture.telemetryConverter.Exporter.KMLExporter;
@@ -18,6 +17,7 @@ import de.dev4Agriculture.telemetryConverter.exceptions.GPSNotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.ZipNotLoadedException;
 import org.apache.commons.collections4.BidiMap;
 import org.apache.commons.collections4.bidimap.DualHashBidiMap;
+import org.apache.logging.log4j.LogManager;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -25,11 +25,15 @@ import javax.swing.border.Border;
 import javax.swing.border.TitledBorder;
 import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.plaf.FontUIResource;
+import javax.swing.plaf.IconUIResource;
 import javax.swing.text.StyleContext;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
+import java.io.PrintStream;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Map;
@@ -37,7 +41,7 @@ import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.Logger;
 
-public class ConverterUI extends ConverterCallback {
+public class ConverterUI {
     private JButton inputPathSelectionButton;
     private JTextField inputPathTextField;
     private JButton outputPathSelectionButton;
@@ -55,6 +59,7 @@ public class ConverterUI extends ConverterCallback {
     private JList logArea;
     private JCheckBox exportRawDataCheckBox;
     private DefaultListModel<String> logAreaModel;
+    private Path settingsPath;
 
     private static UISettings uiSettings;
     private static final String UI_SETTINGS_PATH = "./uiSettings.json";
@@ -69,19 +74,11 @@ public class ConverterUI extends ConverterCallback {
 
     }
 
-    @Override
-    public void printLn(String entry) {
-        super.printLn(entry);
-        SwingUtilities.invokeLater(() -> {
-            logAreaModel.addElement(entry + "\n");
-        });
-    }
-
     public void saveJSONConfig() {
         try {
-            uiSettings.toFile(Paths.get(UI_SETTINGS_PATH));
+            uiSettings.toFile(settingsPath);
         } catch (IOException ioException) {
-            printLn("Could not store updated Settings");
+            System.out.println("Could not store updated Settings");
             ioException.printStackTrace();
         }
     }
@@ -98,6 +95,7 @@ public class ConverterUI extends ConverterCallback {
     }
 
     public void init() {
+
         outputFormatCombobox.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent actionEvent) {
@@ -137,11 +135,28 @@ public class ConverterUI extends ConverterCallback {
         });
         logAreaModel = new DefaultListModel<>();
         logArea.setModel(logAreaModel);
+        PrintStream printStream = new PrintStream(new UIOutputStream(logAreaModel));
+        System.setOut(printStream);
+        System.setErr(printStream);
+
+        Path inFolderPath = null;
         try {
-            uiSettings = UISettings.fromFile(Paths.get(UI_SETTINGS_PATH));
+            inFolderPath = Paths.get(new File(ConverterUI.class.getProtectionDomain().getCodeSource().getLocation().toURI()).getPath(), "uisettings.json");
+        } catch (URISyntaxException e) {
+            System.out.println("WARN: Could not read Path of jar-File; Settings might not be loaded correctly");
+        }
+        Path cliFolderPath = Paths.get(UI_SETTINGS_PATH);
+        if (cliFolderPath.toFile().exists()) {
+            settingsPath = cliFolderPath;
+        } else if (inFolderPath != null) {
+            settingsPath = inFolderPath;
+        }
+
+        try {
+            uiSettings = UISettings.fromFile(settingsPath);
         } catch (IOException ioException) {
             uiSettings = new UISettings();
-            printLn("Could not load Settings");
+            System.out.println("WARN: Could not load Settings");
         }
 
         inputComboboxEntries = new DualHashBidiMap();
@@ -298,7 +313,7 @@ public class ConverterUI extends ConverterCallback {
                                 "\n" +
                                 "Visit https://www.dev4Agriculture.de \n" +
                                 "\n" +
-                                "For License see delivered License.txt"));
+                                "For License see delivered License.txt", "About the ar Telemetry Converter", JOptionPane.INFORMATION_MESSAGE));
     }
 
 
@@ -336,7 +351,7 @@ public class ConverterUI extends ConverterCallback {
             dataImporter = new GPSInfoImporter();
             isZip = false;
         } else {
-            printLn("No Import Format selected");
+            System.out.println("No Import Format selected");
             return;
         }
 
@@ -353,19 +368,19 @@ public class ConverterUI extends ConverterCallback {
             try {
                 Converter.convertEFDIZip(Paths.get(uiSettings.inputPath), Paths.get(uiSettings.outputPath), dataImporter, dataExporter);
             } catch (CSVLockedException csvLockedException) {
-                printLn("Could not access CSV; is it opened?");
+                System.out.println("ERROR: Could not access CSV; is it opened?");
             } catch (EFDINotFoundException efdiNotFoundException) {
-                printLn("EFDI file not found or broken");
+                System.out.println("ERROR: EFDI file not found or broken");
             } catch (ZipNotLoadedException zipNotLoadedException) {
-                printLn("Zip could not be loaded, is it defect?");
+                System.out.println("ERROR: Zip could not be loaded, is it defect?");
             }
         } else {
             try {
                 Converter.convert(Paths.get(uiSettings.inputPath), Paths.get(uiSettings.outputPath), dataImporter, dataExporter);
             } catch (GPSNotFoundException gpsNotFoundException) {
-                printLn("GPSList File could not be found");
+                System.out.println("ERROR: GPSList File could not be found");
             } catch (CSVLockedException csvLockedException) {
-                printLn("Could not access CSV; is it opened?");
+                System.out.println("ERROR: Could not access CSV; is it opened?");
             }
         }
     }
@@ -572,4 +587,5 @@ public class ConverterUI extends ConverterCallback {
     public JComponent $$$getRootComponent$$$() {
         return mainContainer;
     }
+
 }
