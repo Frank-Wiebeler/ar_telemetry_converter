@@ -1,8 +1,11 @@
+import de.dev4Agriculture.telemetryConverter.enumations.OutputFormatEnum;
+import de.dev4Agriculture.telemetryConverter.enumations.InputFormatEnum;
 import de.dev4Agriculture.telemetryConverter.exceptions.EFDINotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.GPSNotFoundException;
 import de.dev4Agriculture.telemetryConverter.cli.TelemetryConverterCLI;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.lf5.util.Resource;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.DefaultConfiguration;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
@@ -18,7 +21,8 @@ public class TelemetryConverterTest {
 
     @BeforeAll
     public static void init(){
-        BasicConfigurator.configure();
+        Configurator.initialize(new DefaultConfiguration());
+        Configurator.setRootLevel(Level.INFO);
         URL resourceURL =TelemetryConverterTest.class.getResource("resrootfile.txt");
         if(resourceURL != null) {
             rootpath = resourceURL.getPath().substring(1);
@@ -31,10 +35,10 @@ public class TelemetryConverterTest {
     @Test
     public void canConvertGPSFiles(){
         rootpath = rootpath.replace("resrootfile.txt","");
-        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/gps/gps.bin",rootpath+"exampleData/gps_output_1.csv",rootpath+"exampleData/settings.json", TelemetryConverterCLI.InputFormat.GPS, TelemetryConverterCLI.OutputFormat.CSV));
+        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/gps/gps.bin",rootpath+"exampleData/gps_output_1.csv",rootpath+"exampleData/settings.json", InputFormatEnum.GPS, OutputFormatEnum.CSV));
 
         assertThrows(GPSNotFoundException.class,
-                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/gps/notthere.bin",rootpath+"exampleData/gps_output_3.bin",rootpath + "exampleData/settings.json", TelemetryConverterCLI.InputFormat.GPS, TelemetryConverterCLI.OutputFormat.CSV),
+                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/gps/notthere.bin",rootpath+"exampleData/gps_output_3.bin",rootpath + "exampleData/settings.json", InputFormatEnum.GPS, OutputFormatEnum.CSV),
                 "Expected notFoundError"
                 );
 
@@ -43,10 +47,10 @@ public class TelemetryConverterTest {
     @Test
     public void canConvertEFDIFiles(){
         rootpath = rootpath.replace("resrootfile.txt","");
-        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/efdi.bin",rootpath+"exampleData/efdi_output_1.csv",rootpath+"exampleData/settings.json", TelemetryConverterCLI.InputFormat.EFDI, TelemetryConverterCLI.OutputFormat.CSV));
+        assertDoesNotThrow(()->TelemetryConverterCLI.convert(rootpath+"exampleData/efdi.bin",rootpath+"exampleData/efdi_output_1.csv",rootpath+"exampleData/settings.json", InputFormatEnum.EFDI, OutputFormatEnum.CSV));
 
         assertThrows(EFDINotFoundException.class,
-                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/efdi/notthere.bin",rootpath+"exampleData/efdi_output_2.csv",rootpath + "exampleData/settings.json", TelemetryConverterCLI.InputFormat.EFDI, TelemetryConverterCLI.OutputFormat.CSV),
+                () -> TelemetryConverterCLI.convert(rootpath + "exampleData/efdi/notthere.bin",rootpath+"exampleData/efdi_output_2.csv",rootpath + "exampleData/settings.json", InputFormatEnum.EFDI, OutputFormatEnum.CSV),
                 "Expected notFoundError"
         );
 

@@ -14,7 +14,8 @@ import de.dev4Agriculture.telemetryConverter.exceptions.EFDINotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.GPSNotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.ZipNotLoadedException;
 import org.aef.efdi.GrpcEfdi;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.*;
 import java.nio.file.Path;
@@ -23,7 +24,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
 public class Converter {
-    private static Logger log = Logger.getLogger(Converter.class);
     private static DateFormat dateFormat;
     private static DataImporter dataImporter;
     private static DataExporter dataExporter;
@@ -94,7 +94,7 @@ public class Converter {
             if(!outFolder.mkdirs()){
                 outFolder = exportFilePath.toFile();//Not sure if we need to assign it again to update the status, but better safe than sorry
                 if(!outFolder.exists()) {
-                    log.error("Root folder to extract convert the files could not be created. Please choose a differen path");
+                    System.out.println("ERROR: Root folder to extract convert the files could not be created. Please choose a differen path");
                     return;
                 }
             }
@@ -151,5 +151,9 @@ public class Converter {
         convert(inputPath,outputPath,dataImporter,dataExporter);
     }
 
+
+    public static String getVersion(){
+        return "V1.4_2021-05-20";
+    }
 
 }

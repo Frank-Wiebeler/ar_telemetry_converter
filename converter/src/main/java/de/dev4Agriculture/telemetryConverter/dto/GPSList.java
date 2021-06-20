@@ -1,16 +1,16 @@
 package de.dev4Agriculture.telemetryConverter.dto;
 
 import agrirouter.technicalmessagetype.Gps;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.apache.log4j.Logger;
 
 public class GPSList {
-    private static Logger log = Logger.getLogger(GPSList.class);
     List<GPSListEntry> gpsEntryList;
     ConverterSettings converterSettings;
     public static DateFormat dateFormat = new SimpleDateFormat();
@@ -45,13 +45,13 @@ public class GPSList {
         }
         int count= entriesToRemove.size();
         gpsEntryList.removeAll(entriesToRemove);
-        log.info("Cleaned List from unknown GPS positions; deleted " + count + " entries");
+        System.out.println("Cleaned List from unknown GPS positions; deleted " + count + " entries");
     }
 
 
     public void sortGPSData() {
         Collections.sort(gpsEntryList);
-        log.info("List sorted by date");
+        System.out.println("List sorted by date");
     }
 
     public void setDateFormat(DateFormat _dateFormat) {

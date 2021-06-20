@@ -4,12 +4,12 @@ import agrirouter.technicalmessagetype.Gps;
 import de.dev4Agriculture.telemetryConverter.dto.GPSList;
 import de.dev4Agriculture.telemetryConverter.dto.GPSListEntry;
 import org.aef.efdi.GrpcEfdi;
+import org.apache.logging.log4j.LogManager;
 
 import java.io.*;
 import java.nio.file.Path;
 
 public class GPSInfoImporter implements  DataImporter {
-
   private Gps.GPSList readProtobufFile(Path name) throws IOException {
     InputStream inputStream = new FileInputStream(name.toString());
     System.out.println("Could load file");

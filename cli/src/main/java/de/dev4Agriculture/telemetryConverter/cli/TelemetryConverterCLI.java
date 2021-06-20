@@ -7,17 +7,19 @@ import de.dev4Agriculture.telemetryConverter.Exporter.KMLExporter;
 import de.dev4Agriculture.telemetryConverter.Importer.DataImporter;
 import de.dev4Agriculture.telemetryConverter.Importer.EFDIImporter;
 import de.dev4Agriculture.telemetryConverter.Importer.GPSInfoImporter;
+import de.dev4Agriculture.telemetryConverter.enumations.OutputFormatEnum;
+import de.dev4Agriculture.telemetryConverter.enumations.InputFormatEnum;
 import de.dev4Agriculture.telemetryConverter.exceptions.*;
-import org.apache.log4j.BasicConfigurator;
-import org.apache.log4j.Logger;
 import de.dev4Agriculture.telemetryConverter.Converter;
 import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
+import de.dev4Agriculture.telemetryConverter.ui.ConverterUI;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.nio.file.Paths;
 import java.util.*;
 
 public class TelemetryConverterCLI {
-    public static Logger log = Logger.getLogger(TelemetryConverterCLI.class);
     public enum NextParamType {
         NONE,
         INPUT,
@@ -27,26 +29,13 @@ public class TelemetryConverterCLI {
         FORMAT_OUT
     }
 
-    public enum InputFormat{
-        UNKNOWN,
-        EFDI,
-        GPS,
-        EFDI_ZIP
-    }
-
-    public enum OutputFormat{
-        UNKNOWN,
-        CSV,
-        KML
-    }
-
-    public static void convert(String inputPath, String outputPath, String settingsPath,InputFormat inputFormat, OutputFormat outputFormat) throws SettingsNotFoundException, GPSNotFoundException, CSVLockedException, EFDINotFoundException, ZipNotLoadedException, NoExporterSpecificedException, NoImporterSpecifiedException {
+    public static void convert(String inputPath, String outputPath, String settingsPath, InputFormatEnum inputFormat, OutputFormatEnum outputFormat) throws SettingsNotFoundException, GPSNotFoundException, CSVLockedException, EFDINotFoundException, ZipNotLoadedException, NoExporterSpecificedException, NoImporterSpecifiedException {
         DataExporter dataExporter;
         DataImporter dataImporter;
         if (inputPath.equals("")) {
-            log.error("No Input path provided");
+            System.out.println("ERROR: No Input path provided");
         } else if (outputPath.equals("")) {
-            log.error("No Output Path provided");
+            System.out.println("ERROR: No Output Path provided");
         }
         ConverterSettings settings;
         if (settingsPath.equals("")) {
@@ -55,20 +44,20 @@ public class TelemetryConverterCLI {
             settings = ConverterSettings.fromFile(settingsPath);
         }
         Converter.setSettings(settings);
-        if( outputFormat.equals(OutputFormat.CSV)){
+        if( outputFormat.equals(OutputFormatEnum.CSV)){
             dataExporter = new CSVExporter();
-        } else if ( outputFormat.equals(OutputFormat.KML)){
+        } else if ( outputFormat.equals(OutputFormatEnum.KML)){
             dataExporter = new KMLExporter();
         } else {
             throw new NoExporterSpecificedException();
         }
-        if (inputFormat.equals(InputFormat.EFDI_ZIP)) {
+        if (inputFormat.equals(InputFormatEnum.EFDI_ZIP)) {
             dataImporter = new EFDIImporter();
             Converter.convertEFDIZip(Paths.get(inputPath), Paths.get(outputPath), dataImporter, dataExporter);
         } else {
-            if (inputFormat.equals(InputFormat.GPS)) {
+            if (inputFormat.equals(InputFormatEnum.GPS)) {
                 dataImporter = new GPSInfoImporter();
-            } else if (inputFormat.equals(InputFormat.EFDI)) {
+            } else if (inputFormat.equals(InputFormatEnum.EFDI)) {
                 dataImporter = new EFDIImporter();
             } else {
                 throw new NoImporterSpecifiedException();
@@ -79,14 +68,17 @@ public class TelemetryConverterCLI {
     }
 
     public static void main(String[] args) {
-        BasicConfigurator.configure();
         boolean infoWasPrinted = false;
         String inputPath = "";
         String outputPath = "";
         String settingsPath = "";
-        InputFormat inputFormat = InputFormat.UNKNOWN;
-        OutputFormat outputFormat = OutputFormat.CSV;//To be backwards compatible, that's the default
+        InputFormatEnum inputFormat = InputFormatEnum.UNKNOWN;
+        OutputFormatEnum outputFormat = OutputFormatEnum.CSV;//To be backwards compatible, that's the default
         NextParamType nextParamType = NextParamType.NONE;
+        if(args.length == 0){
+            ConverterUI.main(null);
+            return;
+        }
         for (String argument : args) {
             if (nextParamType.equals(NextParamType.NONE)) {
                 if (argument.equals("-i")) {
@@ -107,7 +99,7 @@ public class TelemetryConverterCLI {
                     nextParamType = NextParamType.NONE;
                     infoWasPrinted = true;
                     printVersion();
-                } else {
+                }else {
                     System.out.println("Error in the command line syntax. Received entries: " + args.toString());
                 }
             } else if(nextParamType.equals(NextParamType.INPUT)){
@@ -121,27 +113,27 @@ public class TelemetryConverterCLI {
                     nextParamType = NextParamType.NONE;
             } else if(nextParamType.equals(NextParamType.FORMAT_IN)){
                     if(argument.toUpperCase(Locale.ROOT).equals("EFDI")){
-                        inputFormat = InputFormat.EFDI;
+                        inputFormat = InputFormatEnum.EFDI;
                         nextParamType = NextParamType.NONE;
                     } else if (argument.toUpperCase(Locale.ROOT).equals("GPS")){
-                        inputFormat = InputFormat.GPS;
+                        inputFormat = InputFormatEnum.GPS;
                         nextParamType = NextParamType.NONE;
                     } else if (argument.toUpperCase(Locale.ROOT).equals("EFDI_ZIP")){
-                        inputFormat = InputFormat.EFDI_ZIP;
+                        inputFormat = InputFormatEnum.EFDI_ZIP;
                         nextParamType = NextParamType.NONE;
                     } else {
-                        inputFormat = InputFormat.UNKNOWN;
+                        inputFormat = InputFormatEnum.UNKNOWN;
                         nextParamType = NextParamType.NONE;
                     }
             } else if(nextParamType.equals(NextParamType.FORMAT_OUT)){
                 if(argument.toUpperCase(Locale.ROOT).equals("CSV")){
-                    outputFormat = OutputFormat.CSV;
+                    outputFormat = OutputFormatEnum.CSV;
                     nextParamType = NextParamType.NONE;
                 } else if (argument.toUpperCase(Locale.ROOT).equals("KML")){
-                    outputFormat = OutputFormat.KML;
+                    outputFormat = OutputFormatEnum.KML;
                     nextParamType = NextParamType.NONE;
                 } else {
-                    outputFormat = OutputFormat.UNKNOWN;
+                    outputFormat = OutputFormatEnum.UNKNOWN;
                     nextParamType = NextParamType.NONE;
                 }
             }
@@ -151,30 +143,30 @@ public class TelemetryConverterCLI {
             if(infoWasPrinted) {
                 return;
             } else {
-                log.error("InputPath or OutputPath missing");
+                System.out.println("ERROR: InputPath or OutputPath missing");
             }
         }
 
-        if(outputFormat == OutputFormat.UNKNOWN){
-            log.error("Output format is wrong");
+        if(outputFormat == OutputFormatEnum.UNKNOWN){
+            System.out.println("ERROR: Output format is wrong");
         }
 
         try {
             convert(inputPath,outputPath,settingsPath,inputFormat,outputFormat);
         } catch (GPSNotFoundException e) {
-            log.error("Error: GPS File not found");
+            System.out.println("ERROR: GPS File not found");
         } catch (CSVLockedException e) {
-            log.error("Error: CSV-File is locked. Is it opened, e.g. in Excel?");
+            System.out.println("ERROR: CSV-File is locked. Is it opened, e.g. in Excel?");
         } catch (SettingsNotFoundException e) {
-            log.error("Error: Settings could not be loaded");
+            System.out.println("ERROR: Settings could not be loaded");
         } catch (EFDINotFoundException e) {
-            log.error("Error: EFDI could not be loaded");
+            System.out.println("ERROR: EFDI could not be loaded");
         } catch (ZipNotLoadedException e) {
-            log.error("Error: EFDI Zip could not be loaded");
+            System.out.println("ERROR: EFDI Zip could not be loaded");
         } catch (NoImporterSpecifiedException e) {
-            log.error("Error: No importer defined. Must be GPS,EFDI or EFDI_ZIP");
+            System.out.println("ERROR: No importer defined. Must be GPS,EFDI or EFDI_ZIP");
         } catch (NoExporterSpecificedException e) {
-            log.error("Error: No exporter defined. Must be CSV or KML");
+            System.out.println("ERROR: No exporter defined. Must be CSV or KML");
         }
 
 
@@ -212,6 +204,6 @@ public class TelemetryConverterCLI {
 
 
     public static void printVersion(){
-        System.out.println("V1.2_2021-05-12");
+        System.out.println(Converter.getVersion());
     }
 }

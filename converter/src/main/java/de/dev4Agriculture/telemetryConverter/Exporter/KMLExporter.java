@@ -5,7 +5,8 @@ import de.dev4Agriculture.telemetryConverter.Converter;
 import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
 import de.dev4Agriculture.telemetryConverter.dto.GPSList;
 import de.dev4Agriculture.telemetryConverter.dto.GPSListEntry;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -13,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class KMLExporter implements DataExporter {
-    private static org.apache.log4j.Logger log = Logger.getLogger(Converter.class);
     private static final double ALTITUDE_FACTOR = (1.0 / 1000);
     private ConverterSettings settings;
 
@@ -33,13 +33,12 @@ public class KMLExporter implements DataExporter {
                 "      </PolyStyle>\n" +
                 "    </Style>\n" +
                 "    <Placemark>\n" +
-                "      <name>Absolute Extruded</name>\n" +
+                "      <name>Driving Route</name>\n" +
                 "      <description>Transparent green wall with yellow outlines</description>\n" +
                 "      <styleUrl>#yellowLineGreenPoly</styleUrl>\n" +
                 "      <LineString>\n" +
-                "        <extrude>1</extrude>\n" +
                 "        <tessellate>1</tessellate>\n" +
-                "        <coordinates> ";
+                "        <coordinates> \n";
     }
 
     private String getKMLGPSList(GPSList gpsList){
@@ -50,9 +49,10 @@ public class KMLExporter implements DataExporter {
                             (entry.status != Gps.GPSList.GPSEntry.PositionStatus.D_NO_GPS) &&
                             (entry.status != Gps.GPSList.GPSEntry.PositionStatus.D_NOT_AVAILABLE)
             ) {
-                fileContent.append(entry.longitude + "," + entry.latitude + "," + entry.altitude * ALTITUDE_FACTOR + " \n");
+                fileContent.append(entry.longitude + "," + entry.latitude + ",0 ");
             }
         }
+        fileContent.append("\n");
         return  fileContent.toString();
     }
 
@@ -77,6 +77,6 @@ public class KMLExporter implements DataExporter {
 
         writer.write(fileContent);
         writer.close();
-        log.info("Export successfully written");
+        System.out.println("Export successfully written");
     }
 }

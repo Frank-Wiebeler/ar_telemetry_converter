@@ -4,7 +4,9 @@ import de.dev4Agriculture.telemetryConverter.Converter;
 import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
 import de.dev4Agriculture.telemetryConverter.dto.GPSList;
 import de.dev4Agriculture.telemetryConverter.dto.GPSListEntry;
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 
 import java.io.BufferedWriter;
 import java.io.FileWriter;
@@ -12,7 +14,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 
 public class CSVExporter implements DataExporter {
-    private static org.apache.log4j.Logger log = Logger.getLogger(Converter.class);
     private ConverterSettings converterSettings;
 
     public void setConverterSettings(ConverterSettings converterSettings){
@@ -49,7 +50,7 @@ public class CSVExporter implements DataExporter {
 
         writer.write(fileContent);
         writer.close();
-        log.info("Export successfully written");
+        System.out.println("Export successfully written");
     }
 
 }

@@ -3,6 +3,10 @@ import de.dev4Agriculture.telemetryConverter.dto.ConverterSettings;
 import de.dev4Agriculture.telemetryConverter.exceptions.CSVLockedException;
 import de.dev4Agriculture.telemetryConverter.exceptions.GPSNotFoundException;
 import de.dev4Agriculture.telemetryConverter.exceptions.SettingsNotFoundException;
+import org.apache.logging.log4j.Level;
+import org.apache.logging.log4j.core.config.Configurator;
+import org.apache.logging.log4j.core.config.DefaultConfiguration;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.net.URI;
@@ -11,6 +15,12 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GPSInfoImporterTest {
+
+    @BeforeAll
+    private void init(){
+        Configurator.initialize(new DefaultConfiguration());
+        Configurator.setRootLevel(Level.INFO);
+    }
 
     private String resourcePathFromURI(String resourceName) throws URISyntaxException {
         URI uri = ClassLoader.getSystemResource(resourceName).toURI();
