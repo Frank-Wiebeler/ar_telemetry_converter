@@ -43,6 +43,10 @@ V1.1_2021-05-06
 
 To start the UserInterface, don't add any parameters at all.
 
+````shell
+ar_telemetry_converter
+````
+
 ## CommandLine
 
 The tool can be called with different parameters:
